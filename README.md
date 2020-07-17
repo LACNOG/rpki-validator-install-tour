@@ -8,7 +8,7 @@ Scripts y playbooks para instalar los tres validadores de RPKI mas comunes.
 
 ### Routinator 3000
 
-TBW*
+[Slides RPKI Intro e instalación Routinator 3000](routinator3000/intro-RPKI-ES-v5.pptx.pdf)
 
 ### FORT
 
