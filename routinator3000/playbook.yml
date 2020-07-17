@@ -1,5 +1,5 @@
 
-- name: Install barebones irrd4
+- name: Install barebones Routinator3000
   gather_facts: true
   hosts: all
   become: yes
@@ -8,106 +8,55 @@
 
     - name: Install symlink to python 3.6 if it doesn't exist
       file:
-        # src: '/usr/bin/python3.6'
         dest: '/usr/bin/python'
         state: absent
         owner: root
         group: root
-        
-    - name: Set Postfix option hostname
-      debconf: 
-        name=postfix
-        question="postfix/mailname" 
-        value="sandbox" 
-        vtype="string"
-    
-    - name: Set Postfix option type as internet site
-      debconf: 
-        name=postfix 
-        question="postfix/main_mailer_type" 
-        value="'Internet Site'" 
-        vtype="string"
-    
 
-    - name: Install packages
+    - name: Instalar paquetes genéricos
       apt:
          pkg:
-            - postgresql
-            - postgresql-client
-            - postgresql-doc
+            - htop
             - tmux
-            - virtualenv
+            - rsync
             - build-essential
-            - python3-dev
-            - postfix
          state: present	     
          update_cache: yes
 
-    - name: Add user irrd
+    - name: Add user r3k
       user:
-        name: irrd
+        name: r3k
         state: present
         shell: /bin/bash
         groups: 
            - sudo
            
-    - name: Create directories for irrd
+    - name: Create directories for r3k 
       file:
         dest: "{{ item }}"
         state: directory
-        owner: irrd
-        group: irrd
+        owner: r3k
+        group: r3k
       with_items:
-         - /home/irrd/log
-         - /home/irrd/export
-         - /home/irrd/etc
-         - /home/irrd/gnupg-keyring
-         - /home/irrd/db
-         - /home/irrd/_init         
-        
-    - name: Copy postgresql tuned configuration as well as other files
-      copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        owner: "{{ item.o }}"
-        group: "{{ item.g }}"
-      loop:
-        - { src: 'postgresql.conf', dest: '/etc/postgresql/10/main', o: 'postgres', g: 'postgres'}
-        - { src: 'irrd.yml', dest: '/home/irrd/_init', o: 'irrd', g: 'irrd'}
-        - { src: 'irrd2.yml', dest: '/home/irrd/_init', o: 'irrd', g: 'irrd'}        
-        - { src: 'fetch_files.sh', dest: '/home/irrd/', o: 'irrd', g: 'irrd'} 
-        - { src: 'initdb.sql', dest: '/var/lib/postgresql', o: 'postgres', g: 'postgres'} 
-        
-    - name: Restart service postgresql, in all cases
-      service:
-        name: postgresql
-        state: reloaded        
-        
-    - name: Init psql db
-      become_user: postgres
+         - /home/r3k/log
+         - /home/r3k/export
+
+    - name: Instalar RUST via rustup
+      become_user: r3k
       shell: |
-         psql -f /var/lib/postgresql/initdb.sql
-         touch /var/lib/postgresql/dbinit.done
-      args:
-         creates: /var/lib/postgresql/dbinit.done
+         cd /home/r3k
+         curl https://sh.rustup.rs -sSf > rustup.sh
+         sh rustup.sh -y 
         
-         
-    - name: Install irrd4 RELEASE
-      become_user: irrd
+    - name: Instalar ROUTINATOR 3000
+      become_user: r3k
       shell: |
-         cd /home/irrd
-         virtualenv -p python3 /home/irrd/irrd-venv
-         /home/irrd/irrd-venv/bin/pip3 install irrd
-         cp _init/irrd.yml etc/irrd.yml
-         /home/irrd/irrd-venv/bin/irrd_database_upgrade --config=/home/irrd/etc/irrd.yml
-         
-         
-    - name: Install irrd4 SYNTHETIC NRTM
-      become_user: irrd
+         cd /home/r3k
+         cargo install routinator
+
+    - name: Inicializar y ejecutar ROUTINATOR 3000
+      become_user: r3k
       shell: |
-         cd /home/irrd
-         virtualenv -p python3 /home/irrd/srtm-irrd-venv
-         /home/irrd/srtm-irrd-venv/bin/pip3 install git+https://github.com/irrdnet/irrd4@master
-         cp _init/irrd2.yml etc/irrd2.yml
-         /home/irrd/srtm-irrd-venv/bin/irrd_database_upgrade --config=/home/irrd/etc/irrd2.yml
-         
+         routinator init --accept-arin-rpa
+
+
