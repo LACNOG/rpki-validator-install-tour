@@ -52,11 +52,12 @@
       become_user: r3k
       shell: |
          cd /home/r3k
-         cargo install routinator
+         source /home/r3k/.cargo/env
+         /home/r3k/.cargo/bin/cargo install routinator
 
     - name: Inicializar y ejecutar ROUTINATOR 3000
       become_user: r3k
       shell: |
-         routinator init --accept-arin-rpa
+         /home/r3k/.cargo/bin/routinator init --accept-arin-rpa
 
 
