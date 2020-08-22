@@ -1,0 +1,31 @@
+[Unit]
+Description=RIPE NCC RPKI Validator 3
+Documentation=https://github.com/RIPE-NCC/rpki-validator-3/wiki
+After=network-online.target
+AssertFileIsExecutable=/usr/local/rpki-validator-3/rpki-validator-3.sh
+
+[Service]
+Environment=JAVA_CMD=/usr/bin/java
+Environment=CONFIG_DIR=/usr/local/rpki-validator-3/conf
+Environment=JAR=/usr/local/rpki-validator-3/lib/rpki-validator-3.jar
+WorkingDirectory=/usr/local/rpki-validator-3/
+
+User=rpki
+Group=rpki
+
+ExecStart=/usr/local/rpki-validator-3/rpki-validator-3.sh
+
+# Let systemd restart this service always
+Restart=always
+RestartPreventExitStatus=7
+RestartForceExitStatus=3
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65536
+
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=infinity
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target

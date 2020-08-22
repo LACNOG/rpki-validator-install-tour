@@ -1,0 +1,31 @@
+[Unit]
+Description=RIPE NCC RPKI RTR Server
+Documentation=https://github.com/RIPE-NCC/rpki-validator-3/tree/master/rpki-rtr-server
+After=network-online.target
+AssertFileIsExecutable=/usr/local/rpki-rtr-server/rpki-rtr-server.sh
+
+[Service]
+Environment=JAVA_CMD=/usr/bin/java
+Environment=CONFIG_DIR=/usr/local/rpki-rtr-server/conf
+Environment=JAR=/usr/local/rpki-rtr-server/lib/rpki-rtr-server.jar
+WorkingDirectory=/usr/local/rpki-rtr-server
+
+User=rpki
+Group=rpki
+
+ExecStart=/usr/local/rpki-rtr-server/rpki-rtr-server.sh
+
+# Let systemd restart this service always
+Restart=always
+RestartPreventExitStatus=7
+RestartForceExitStatus=3
+
+# Specifies the maximum file descriptor number that can be opened by this process
+LimitNOFILE=65536
+
+# Disable timeout logic and wait until process is stopped
+TimeoutStopSec=infinity
+SendSIGKILL=no
+
+[Install]
+WantedBy=multi-user.target
