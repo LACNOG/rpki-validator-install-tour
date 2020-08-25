@@ -171,9 +171,9 @@ curl -L https://raw.githubusercontent.com/LACNOG/rpki-validator-install-tour/mas
 touch /etc/nginx/.htpasswd
 
 # Creo los usuarios
-htpasswd /etc/nginx/htpasswd admin
-htpasswd /etc/nginx/htpasswd admin2
-htpasswd /etc/nginx/htpasswd otroadmin
+htpasswd /etc/nginx/.htpasswd admin
+htpasswd /etc/nginx/.htpasswd admin2
+htpasswd /etc/nginx/.htpasswd otroadmin
 
 # Reinicio el servicio
 systemctl restart nginx
