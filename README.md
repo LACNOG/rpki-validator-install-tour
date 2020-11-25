@@ -2,7 +2,10 @@
 
 Scripts y playbooks para instalar los tres validadores de RPKI mas comunes.
 
-(c) Carlos M. Martinez, cmartinez@nog.lat
+**Autores y colaboradores**:
+
+Ariel Weher
+Carlos M. Martinez, cmartinez@nog.lat
 
 Julio de 2020
 
