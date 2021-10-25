@@ -20,6 +20,8 @@
             - tmux
             - rsync
             - build-essential
+            - doxygen
+            - cmake
          state: present	     
          update_cache: yes
 
@@ -47,6 +49,7 @@
          cd /home/r3k
          curl https://sh.rustup.rs -sSf > rustup.sh
          sh rustup.sh -y 
+         rm rustup.sh
         
     - name: Instalar ROUTINATOR 3000
       become_user: r3k
@@ -60,4 +63,14 @@
       shell: |
          /home/r3k/.cargo/bin/routinator init --accept-arin-rpa
 
-
+    - name: Instalar la RTRlib y el RTRClient
+      become_user: root
+      shell: |
+         git clone https://github.com/rtrlib/rtrlib.git rtrlib.git
+         cd rtrlib.git
+         cmake -D CMAKE_BUILD_TYPE=Release -D RTRLIB_TRANSPORT_SSH=No .
+         make
+         make install
+         echo /usr/local/lib >> /etc/ld.so.conf.d/usr.local.lib.conf
+         ldconfig
+         
